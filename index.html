@@ -47,7 +47,6 @@
       font-size: 0.9rem;
       margin-bottom: 16px;
     }
-    /* Sélecteur de timbre */
     .timbre-bar {
       display: flex;
       align-items: center;
@@ -88,7 +87,6 @@
       margin-bottom: 10px;
       text-align: left;
     }
-    /* Mode Écoute ciblée */
     .grid-degrees {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -121,7 +119,6 @@
     .btn-degree-direct:active {
       transform: scale(0.97);
     }
-    /* Filtres du Quiz */
     .filter-box {
       background: #f8fafc;
       border: 1px solid var(--border);
@@ -159,7 +156,6 @@
       cursor: pointer;
       user-select: none;
     }
-    /* Boutons Quiz */
     .btn-group {
       display: flex;
       flex-direction: column;
@@ -211,7 +207,6 @@
       opacity: 0.45;
       cursor: not-allowed !important;
     }
-    /* Boîte réponse */
     .answer-box {
       background: #f8fafc;
       border: 2px dashed #cbd5e1;
@@ -243,7 +238,6 @@
     <h1>Ear Training Tonale</h1>
     <p class="subtitle">Méthode Bruce Arnold — Ressentir le degré</p>
 
-    <!-- CHOIX DU TIMBRE -->
     <div class="timbre-bar">
       <span>Sonorité de l'instrument :</span>
       <select id="select-timbre">
@@ -255,11 +249,9 @@
 
     <div class="status" id="status">Prêt. Choisis une action ci-dessous.</div>
 
-    <!-- SECTION 1 : APPRENTISSAGE CIBLÉ -->
     <div class="section-title">1. Écoute ciblée (apprivoiser la sensation)</div>
     <div class="grid-degrees" id="grid-direct"></div>
 
-    <!-- SECTION 2 : QUIZ À L'AVEUGLE -->
     <div class="section-title">2. Quiz à l'aveugle</div>
 
     <div class="filter-box">
@@ -289,14 +281,22 @@
   </div>
 
   <script>
-    // --- MOTEUR AUDIO AVEC GESTION MULTI-TIMBRES ---
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let actx = null;
     let masterGain = null;
     let delayNode = null;
     let feedbackGain = null;
 
+    // Force Android et iOS à router le son dans le canal "Média"
+    function forceMediaChannel() {
+      const silentAudio = new Audio();
+      silentAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+      silentAudio.play().catch(() => {});
+    }
+
     function initAudio() {
+      forceMediaChannel();
+
       if (!actx) {
         actx = new AudioContext();
         masterGain = actx.createGain();
@@ -367,7 +367,6 @@
         filter.frequency.exponentialRampToValueAtTime(1000, startTime + duration);
 
       } else if (timbre === 'organ') {
-        // Flûte / orgue très doux, pas d'attaque percussive, tenue très stable
         osc1.type = 'sine';
         osc2.type = 'sine';
         osc3.type = 'triangle';
@@ -387,7 +386,6 @@
         filter.frequency.setValueAtTime(filterCutoff, startTime);
 
       } else if (timbre === 'piano') {
-        // Piano acoustique doux (attaque plus distincte, décroissance exponentielle)
         osc1.type = 'triangle';
         osc2.type = 'sine';
         osc3.type = 'sine';
@@ -407,13 +405,11 @@
         filter.frequency.exponentialRampToValueAtTime(800, startTime + duration * 0.8);
       }
 
-      // Enveloppe d'amplitude (ADSR)
       env.gain.setValueAtTime(0.0001, startTime);
       env.gain.linearRampToValueAtTime(velocity, startTime + attack);
       env.gain.exponentialRampToValueAtTime(velocity * 0.75, startTime + Math.max(attack + 0.1, duration - release));
       env.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
-      // Branchements
       osc1.connect(filter);
       osc2.connect(gainOsc2);
       gainOsc2.connect(filter);
@@ -440,7 +436,6 @@
       });
     }
 
-    // --- DONNÉES MUSICALES ---
     const TONICS = [
       { name: "Do", midi: 48 },
       { name: "Ré♭", midi: 49 },
@@ -475,14 +470,13 @@
 
     function getCadenceMidis(tonicMidi) {
       return [
-        [tonicMidi, tonicMidi + 7, tonicMidi + 12, tonicMidi + 16], // I
-        [tonicMidi + 5, tonicMidi + 9, tonicMidi + 12, tonicMidi + 17], // IV
-        [tonicMidi + 7, tonicMidi + 7, tonicMidi + 11, tonicMidi + 14], // V
-        [tonicMidi, tonicMidi + 7, tonicMidi + 12, tonicMidi + 16]  // I
+        [tonicMidi, tonicMidi + 7, tonicMidi + 12, tonicMidi + 16],
+        [tonicMidi + 5, tonicMidi + 9, tonicMidi + 12, tonicMidi + 17],
+        [tonicMidi + 7, tonicMidi + 7, tonicMidi + 11, tonicMidi + 14],
+        [tonicMidi, tonicMidi + 7, tonicMidi + 12, tonicMidi + 16]
       ];
     }
 
-    // --- CONSTRUCTION DE L'INTERFACE ---
     const gridDirect = document.getElementById('grid-direct');
     const checkboxGrid = document.getElementById('checkbox-grid');
 
@@ -519,7 +513,6 @@
       });
     });
 
-    // --- ÉTAT DU LECTEUR ---
     let currentTonic = null;
     let currentDegree = null;
     let currentTargetMidi = null;
@@ -542,7 +535,6 @@
       document.querySelectorAll('.btn-degree-direct').forEach(b => b.disabled = state);
     }
 
-    // Séquencement fluide des accords
     function sequenceAudio(mode = 'quiz') {
       initAudio();
       setAllInteractiveDisabled(true);
@@ -554,18 +546,14 @@
       statusEl.textContent = "Écoute de la cadence...";
 
       const chords = getCadenceMidis(currentTonic.midi);
-      
-      // TEMPO RAPPROCHÉ ET PLUS MUSICAL :
-      const chordStep = 1.0;       // 1 seconde entre chaque attaque d'accord
-      const chordDuration = 1.35;  // 1,35 s de tenue (recouvrement legato parfait)
+      const chordStep = 1.0;
+      const chordDuration = 1.35;
 
       chords.forEach((chord, idx) => {
-        // Le dernier I résonne un poil plus (1.8s) pour bien poser la tonique
         const dur = (idx === 3) ? 1.8 : chordDuration;
         playChord(chord, now + (idx * chordStep), dur);
       });
 
-      // Pause resserrée avant la note cible (3 pas + fin du dernier accord + 0.8s)
       const targetTime = now + (3 * chordStep) + 1.85;
 
       setTimeout(() => {
