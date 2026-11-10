@@ -831,4 +831,11 @@
 
     btnReveal.addEventListener('click', () => {
       if (!currentDegree) return;
-      revealAnswer(true
+      revealAnswer(true);
+      const correctBtn = document.querySelector(`.btn-quiz-choice[data-id="${currentDegree.id}"]`);
+      if (correctBtn) correctBtn.classList.add('correct');
+      document.querySelectorAll('.btn-quiz-choice').forEach(b => b.disabled = true);
+    });
+  </script>
+</body>
+</html>
