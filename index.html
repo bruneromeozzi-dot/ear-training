@@ -340,6 +340,7 @@
 <body>
 
   <div class="container">
+    <audio id="media-anchor" preload="auto" playsinline src="data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA"></audio>
     <h1>Ear Training Tonale</h1>
     <p class="subtitle">Méthode Bruce Arnold — Perception relative des degrés</p>
 
@@ -439,10 +440,12 @@
     let feedbackGain = null;
 
     function forceMediaChannel() {
-      const silentAudio = new Audio();
-      silentAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
-      silentAudio.play().catch(() => {});
-    }
+  	const anchor = document.getElementById('media-anchor');
+  	if (anchor) {
+   	 anchor.currentTime = 0;
+    	anchor.play().catch(() => {});
+  	}
+}
 
     function initAudio() {
       forceMediaChannel();
