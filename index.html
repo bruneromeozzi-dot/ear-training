@@ -10,6 +10,8 @@
       --card: #ffffff;
       --primary: #2563eb;
       --primary-hover: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
       --text: #1e293b;
       --muted: #64748b;
       --border: #e2e8f0;
@@ -24,7 +26,7 @@
       align-items: flex-start;
       min-height: 100vh;
       margin: 0;
-      padding: 24px 16px;
+      padding: 20px 14px;
       box-sizing: border-box;
     }
     .container {
@@ -32,68 +34,106 @@
       border-radius: 16px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.06);
       border: 1px solid var(--border);
-      max-width: 580px;
+      max-width: 600px;
       width: 100%;
-      padding: 28px 24px;
+      padding: 24px 20px;
       text-align: center;
     }
     h1 {
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       margin-top: 0;
       margin-bottom: 4px;
     }
     p.subtitle {
       color: var(--muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       margin-bottom: 16px;
     }
-    .timbre-bar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+    
+    /* Barre d'options (Timbre + Switch Basse) */
+    .controls-bar {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
       background: #f1f5f9;
-      padding: 6px 12px;
-      border-radius: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
       margin-bottom: 18px;
-      font-size: 0.85rem;
-      color: var(--text);
+      font-size: 0.82rem;
+      text-align: left;
     }
-    .timbre-bar select {
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .control-item label {
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .control-item select {
       font-family: inherit;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--primary);
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 4px 8px;
+      padding: 6px;
       cursor: pointer;
     }
+    .toggle-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .toggle-wrapper input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
     .status {
-      min-height: 26px;
-      font-size: 1rem;
+      min-height: 28px;
+      font-size: 0.98rem;
       color: var(--primary);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       font-weight: 600;
     }
+    .score-badge {
+      display: inline-block;
+      background: #e2e8f0;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
     .section-title {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--muted);
-      margin-top: 22px;
+      margin-top: 20px;
       margin-bottom: 10px;
       text-align: left;
     }
+
+    /* Grilles de boutons */
     .grid-degrees {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       margin-bottom: 16px;
     }
-    .btn-degree-direct {
+    .btn-degree {
       background: #f1f5f9;
       color: var(--text);
       border: 1px solid var(--border);
@@ -108,36 +148,79 @@
       gap: 2px;
       transition: all 0.15s ease;
     }
-    .btn-degree-direct strong {
+    .btn-degree strong {
       font-size: 1.05rem;
       color: var(--primary);
     }
-    .btn-degree-direct:hover {
+    .btn-degree:hover {
       background: #e2e8f0;
-      border-color: #cbd5e1;
     }
-    .btn-degree-direct:active {
+    .btn-degree:active {
       transform: scale(0.97);
     }
+
+    /* Grille de réponse interactive */
+    .grid-quiz-answers {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .btn-quiz-choice {
+      background: #fff;
+      border: 2px solid var(--border);
+      padding: 10px 4px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+    .btn-quiz-choice strong {
+      font-size: 1.15rem;
+      color: var(--accent);
+    }
+    .btn-quiz-choice span {
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .btn-quiz-choice:hover:not(:disabled) {
+      border-color: var(--primary);
+      background: #f8fafc;
+    }
+    .btn-quiz-choice.correct {
+      background: #dcfce7 !important;
+      border-color: var(--success) !important;
+      color: #14532d !important;
+    }
+    .btn-quiz-choice.wrong {
+      background: #fee2e2 !important;
+      border-color: var(--danger) !important;
+      color: #7f1d1d !important;
+    }
+
+    /* Filtres du Quiz */
     .filter-box {
       background: #f8fafc;
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 12px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       text-align: left;
     }
     .filter-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
     }
     .btn-tag {
       background: #fff;
       border: 1px solid var(--border);
-      font-size: 0.75rem;
-      padding: 4px 10px;
+      font-size: 0.72rem;
+      padding: 4px 8px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 500;
@@ -146,8 +229,8 @@
     .checkbox-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 6px 12px;
-      font-size: 0.82rem;
+      gap: 5px 8px;
+      font-size: 0.8rem;
     }
     .checkbox-grid label {
       display: flex;
@@ -156,78 +239,82 @@
       cursor: pointer;
       user-select: none;
     }
+
+    /* Commandes */
     .btn-group {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 16px;
-    }
-    button {
-      font-family: inherit;
+      margin-bottom: 14px;
     }
     .btn-main {
       background: var(--primary);
       color: #fff;
       border: none;
-      padding: 14px 18px;
+      padding: 14px;
       border-radius: 10px;
       font-size: 1.05rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
     }
     .btn-main:hover { background: var(--primary-hover); }
     .btn-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
     }
     .btn-sub {
       flex: 1;
       background: #f1f5f9;
       color: var(--text);
       border: 1px solid var(--border);
-      padding: 11px;
-      border-radius: 10px;
-      font-size: 0.88rem;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
     }
     .btn-sub:hover { background: #e2e8f0; }
-    .btn-reveal {
-      background: var(--accent);
+    .btn-resolve {
+      background: #047857;
       color: #fff;
       border: none;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 0.95rem;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 0.9rem;
       font-weight: 600;
       cursor: pointer;
+      margin-top: 6px;
+      display: none;
     }
-    .btn-reveal:hover { background: #1e293b; }
+    .btn-resolve:hover { background: #065f46; }
+
     button:disabled {
       opacity: 0.45;
       cursor: not-allowed !important;
     }
+
+    /* Boîte réponse */
     .answer-box {
       background: #f8fafc;
       border: 2px dashed #cbd5e1;
       border-radius: 12px;
-      padding: 16px;
-      margin-top: 12px;
+      padding: 14px;
+      margin-top: 10px;
       display: none;
     }
     .answer-degree {
-      font-size: 2.2rem;
+      font-size: 2.1rem;
       font-weight: 800;
       color: var(--primary);
-      margin-bottom: 4px;
+      margin-bottom: 2px;
     }
     .answer-name {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 600;
       margin-bottom: 4px;
     }
     .answer-detail {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--muted);
     }
   </style>
@@ -238,24 +325,40 @@
     <h1>Ear Training Tonale</h1>
     <p class="subtitle">Méthode Bruce Arnold — Ressentir le degré</p>
 
-    <div class="timbre-bar">
-      <span>Sonorité de l'instrument :</span>
-      <select id="select-timbre">
-        <option value="rhodes">Rhodes feutré (rond et spatial)</option>
-        <option value="organ">Flûte / Orgue doux (méditatif)</option>
-        <option value="piano">Piano acoustique doux</option>
-      </select>
+    <!-- BARRE D'OPTIONS (TIMBRE & BASSE) -->
+    <div class="controls-bar">
+      <div class="control-item">
+        <label for="select-timbre">Sonorité :</label>
+        <select id="select-timbre">
+          <option value="rhodes">Rhodes feutré</option>
+          <option value="organ">Flûte / Orgue doux</option>
+          <option value="piano">Piano acoustique</option>
+          <option value="marimba">Marimba feutré</option>
+          <option value="strings">Cordes d'ensemble</option>
+          <option value="choir">Chœur doux (Pad)</option>
+        </select>
+      </div>
+      <div class="control-item">
+        <label>Accords de la cadence :</label>
+        <label class="toggle-wrapper">
+          <input type="checkbox" id="check-inversions">
+          <span>Autoriser renversements</span>
+        </label>
+      </div>
     </div>
 
-    <div class="status" id="status">Prêt. Choisis une action ci-dessous.</div>
+    <div class="status" id="status">Prêt. Clique sur « Nouvelle écoute »</div>
+    <div class="score-badge" id="score-badge">Score Quiz : 0 / 0 (0%)</div>
 
+    <!-- SECTION 1 : ÉCOUTE CIBLÉE -->
     <div class="section-title">1. Écoute ciblée (apprivoiser la sensation)</div>
     <div class="grid-degrees" id="grid-direct"></div>
 
+    <!-- SECTION 2 : QUIZ INTERACTIF -->
     <div class="section-title">2. Quiz à l'aveugle</div>
 
     <div class="filter-box">
-      <div style="font-weight: 600; font-size: 0.8rem; margin-bottom: 6px;">Degrés autorisés dans le quiz :</div>
+      <div style="font-weight: 600; font-size: 0.78rem; margin-bottom: 6px;">Filtre des degrés pour le quiz :</div>
       <div class="filter-actions">
         <button class="btn-tag" id="btn-select-diatonic">Diatonique majeur (1 à 7)</button>
         <button class="btn-tag" id="btn-select-triad">Accords 1 - 3 - 5</button>
@@ -265,13 +368,21 @@
     </div>
 
     <div class="btn-group">
-      <button class="btn-main" id="btn-play-quiz">▶ Nouvelle écoute (Quiz au hasard)</button>
+      <button class="btn-main" id="btn-play-quiz">▶ Nouvelle écoute (Quiz)</button>
       <div class="btn-row">
         <button class="btn-sub" id="btn-replay-all" disabled>🔁 Cadence + note</button>
         <button class="btn-sub" id="btn-replay-note" disabled>🎵 Note seule</button>
+        <button class="btn-sub" id="btn-reveal" disabled>👁 Réponse</button>
       </div>
-      <button class="btn-reveal" id="btn-reveal" disabled>👁 Voir la réponse</button>
     </div>
+
+    <!-- GRILLE DE RÉPONSES CLIQUABLES DU QUIZ -->
+    <div style="font-weight: 600; font-size: 0.8rem; margin-bottom: 8px; text-align: left; display: none;" id="quiz-instruction">
+      Clique sur le degré entendu :
+    </div>
+    <div class="grid-quiz-answers" id="grid-quiz-answers"></div>
+
+    <button class="btn-resolve" id="btn-resolve">➜ Entendre la résolution de la note</button>
 
     <div class="answer-box" id="answer-box">
       <div class="answer-degree" id="ans-degree">-</div>
@@ -287,7 +398,6 @@
     let delayNode = null;
     let feedbackGain = null;
 
-    // Force Android et iOS à router le son dans le canal "Média"
     function forceMediaChannel() {
       const silentAudio = new Audio();
       silentAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
@@ -296,7 +406,6 @@
 
     function initAudio() {
       forceMediaChannel();
-
       if (!actx) {
         actx = new AudioContext();
         masterGain = actx.createGain();
@@ -328,6 +437,7 @@
 
     const selectTimbre = document.getElementById('select-timbre');
 
+    // --- MOTEUR MULTI-TIMBRES DE SYNTHÈSE NATIVE ---
     function playTone(midi, startTime, duration = 1.6, velocity = 0.22) {
       const timbre = selectTimbre.value;
       const freq = midiToFreq(midi);
@@ -343,66 +453,80 @@
 
       let attack = 0.05;
       let release = 0.6;
-      let filterCutoff = 1500;
 
       if (timbre === 'rhodes') {
-        osc1.type = 'sine';
-        osc2.type = 'triangle';
-        osc3.type = 'sine';
-
+        osc1.type = 'sine'; osc2.type = 'triangle'; osc3.type = 'sine';
         osc1.frequency.setValueAtTime(freq, startTime);
         osc2.frequency.setValueAtTime(freq * 2, startTime);
         osc3.frequency.setValueAtTime(freq * 3, startTime);
-
         gainOsc2.gain.setValueAtTime(0.26, startTime);
         gainOsc3.gain.setValueAtTime(0.08, startTime);
-
-        attack = 0.05;
-        release = 0.6;
-        filterCutoff = 1600;
-
+        attack = 0.05; release = 0.6;
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(filterCutoff, startTime);
+        filter.frequency.setValueAtTime(1600, startTime);
         filter.frequency.exponentialRampToValueAtTime(2600, startTime + 0.1);
         filter.frequency.exponentialRampToValueAtTime(1000, startTime + duration);
 
       } else if (timbre === 'organ') {
-        osc1.type = 'sine';
-        osc2.type = 'sine';
-        osc3.type = 'triangle';
-
+        osc1.type = 'sine'; osc2.type = 'sine'; osc3.type = 'triangle';
         osc1.frequency.setValueAtTime(freq, startTime);
         osc2.frequency.setValueAtTime(freq * 2, startTime);
         osc3.frequency.setValueAtTime(freq * 4, startTime);
-
         gainOsc2.gain.setValueAtTime(0.18, startTime);
         gainOsc3.gain.setValueAtTime(0.04, startTime);
-
-        attack = 0.10;
-        release = 0.5;
-        filterCutoff = 1200;
-
+        attack = 0.10; release = 0.5;
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(filterCutoff, startTime);
+        filter.frequency.setValueAtTime(1200, startTime);
 
       } else if (timbre === 'piano') {
-        osc1.type = 'triangle';
-        osc2.type = 'sine';
-        osc3.type = 'sine';
-
+        osc1.type = 'triangle'; osc2.type = 'sine'; osc3.type = 'sine';
         osc1.frequency.setValueAtTime(freq, startTime);
         osc2.frequency.setValueAtTime(freq * 2, startTime);
         osc3.frequency.setValueAtTime(freq * 3, startTime);
-
         gainOsc2.gain.setValueAtTime(0.35, startTime);
         gainOsc3.gain.setValueAtTime(0.12, startTime);
-
-        attack = 0.015;
-        release = 0.8;
-
+        attack = 0.015; release = 0.8;
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(3200, startTime);
         filter.frequency.exponentialRampToValueAtTime(800, startTime + duration * 0.8);
+
+      } else if (timbre === 'marimba') {
+        osc1.type = 'sine'; osc2.type = 'sine'; osc3.type = 'triangle';
+        osc1.frequency.setValueAtTime(freq, startTime);
+        osc2.frequency.setValueAtTime(freq * 3.8, startTime); // partiel inharmonique boisé
+        osc3.frequency.setValueAtTime(freq * 2, startTime);
+        gainOsc2.gain.setValueAtTime(0.18, startTime);
+        gainOsc3.gain.setValueAtTime(0.12, startTime);
+        attack = 0.008; release = 0.5;
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(2200, startTime);
+        filter.frequency.exponentialRampToValueAtTime(600, startTime + 0.3);
+
+      } else if (timbre === 'strings') {
+        // Désaccord subtil (Chorus naturel)
+        osc1.type = 'sawtooth'; osc2.type = 'sawtooth'; osc3.type = 'triangle';
+        osc1.frequency.setValueAtTime(freq, startTime);
+        osc2.frequency.setValueAtTime(freq * Math.pow(2, 4/1200), startTime); // +4 cents
+        osc3.frequency.setValueAtTime(freq * Math.pow(2, -4/1200), startTime); // -4 cents
+        gainOsc2.gain.setValueAtTime(0.3, startTime);
+        gainOsc3.gain.setValueAtTime(0.2, startTime);
+        attack = 0.22; release = 0.75;
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(950, startTime);
+        filter.frequency.linearRampToValueAtTime(1400, startTime + 0.4);
+
+      } else if (timbre === 'choir') {
+        // Formants de voyelle [u]/[o]
+        osc1.type = 'triangle'; osc2.type = 'sine'; osc3.type = 'sine';
+        osc1.frequency.setValueAtTime(freq, startTime);
+        osc2.frequency.setValueAtTime(freq * 2, startTime);
+        osc3.frequency.setValueAtTime(freq * 3, startTime);
+        gainOsc2.gain.setValueAtTime(0.25, startTime);
+        gainOsc3.gain.setValueAtTime(0.08, startTime);
+        attack = 0.18; release = 0.7;
+        filter.type = 'bandpass';
+        filter.Q.setValueAtTime(3.5, startTime);
+        filter.frequency.setValueAtTime(750, startTime);
       }
 
       env.gain.setValueAtTime(0.0001, startTime);
@@ -411,217 +535,126 @@
       env.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
       osc1.connect(filter);
-      osc2.connect(gainOsc2);
-      gainOsc2.connect(filter);
-      osc3.connect(gainOsc3);
-      gainOsc3.connect(filter);
-
+      osc2.connect(gainOsc2); gainOsc2.connect(filter);
+      osc3.connect(gainOsc3); gainOsc3.connect(filter);
       filter.connect(env);
       env.connect(masterGain);
 
       const stopTime = startTime + duration + 0.1;
-      osc1.start(startTime);
-      osc2.start(startTime);
-      osc3.start(startTime);
-
-      osc1.stop(stopTime);
-      osc2.stop(stopTime);
-      osc3.stop(stopTime);
+      osc1.start(startTime); osc2.start(startTime); osc3.start(startTime);
+      osc1.stop(stopTime); osc2.stop(stopTime); osc3.stop(stopTime);
     }
 
     function playChord(midis, startTime, duration = 1.35) {
       midis.forEach((m, idx) => {
-        const vel = idx === 0 ? 0.22 : 0.14;
+        const vel = idx === 0 ? 0.23 : 0.14;
         playTone(m, startTime, duration, vel);
       });
     }
 
+    // --- DONNÉES MUSICALES & RÉSOLUTIONS ---
     const TONICS = [
-      { name: "Do", midi: 48 },
-      { name: "Ré♭", midi: 49 },
-      { name: "Ré", midi: 50 },
-      { name: "Mi♭", midi: 51 },
-      { name: "Mi", midi: 52 },
-      { name: "Fa", midi: 53 },
-      { name: "Fa♯", midi: 54 },
-      { name: "Sol", midi: 55 },
-      { name: "La♭", midi: 56 },
-      { name: "La", midi: 57 },
-      { name: "Si♭", midi: 58 },
-      { name: "Si", midi: 59 }
+      { name: "Do", midi: 48 }, { name: "Ré♭", midi: 49 }, { name: "Ré", midi: 50 },
+      { name: "Mi♭", midi: 51 }, { name: "Mi", midi: 52 }, { name: "Fa", midi: 53 },
+      { name: "Fa♯", midi: 54 }, { name: "Sol", midi: 55 }, { name: "La♭", midi: 56 },
+      { name: "La", midi: 57 }, { name: "Si♭", midi: 58 }, { name: "Si", midi: 59 }
     ];
 
+    // Chaque degré a sa demi-ton de résolution naturel vers l'accord I (0 = Tonique, 4 = Tierce, 7 = Quinte, 12 = Octave)
     const DEGREES = [
-      { id: "1", degree: "1", short: "Tonique", name: "Tonique", semitones: 0, diatonic: true },
-      { id: "b2", degree: "♭2", short: "2de min", name: "Seconde mineure", semitones: 1, diatonic: false },
-      { id: "2", degree: "2", short: "2de Maj", name: "Seconde majeure", semitones: 2, diatonic: true },
-      { id: "b3", degree: "♭3", short: "3ce min", name: "Tierce mineure", semitones: 3, diatonic: false },
-      { id: "3", degree: "3", short: "3ce Maj", name: "Tierce majeure", semitones: 4, diatonic: true },
-      { id: "4", degree: "4", short: "Quarte", name: "Quarte juste", semitones: 5, diatonic: true },
-      { id: "b5", degree: "♯4 / ♭5", short: "Triton", name: "Quarte augm. / Triton", semitones: 6, diatonic: false },
-      { id: "5", degree: "5", short: "Quinte", name: "Quinte juste", semitones: 7, diatonic: true },
-      { id: "b6", degree: "♭6", short: "6te min", name: "Sixte mineure", semitones: 8, diatonic: false },
-      { id: "6", degree: "6", short: "6te Maj", name: "Sixte majeure", semitones: 9, diatonic: true },
-      { id: "b7", degree: "♭7", short: "7e min", name: "Septième mineure", semitones: 10, diatonic: false },
-      { id: "7", degree: "7", short: "Sensible", name: "Sensible (7e majeure)", semitones: 11, diatonic: true }
+      { id: "1", degree: "1", short: "Tonique", name: "Tonique", semitones: 0, diatonic: true, resolveTo: 0 },
+      { id: "b2", degree: "♭2", short: "2de min", name: "Seconde mineure", semitones: 1, diatonic: false, resolveTo: 0 },
+      { id: "2", degree: "2", short: "2de Maj", name: "Seconde majeure", semitones: 2, diatonic: true, resolveTo: 0 },
+      { id: "b3", degree: "♭3", short: "3ce min", name: "Tierce mineure", semitones: 3, diatonic: false, resolveTo: 4 },
+      { id: "3", degree: "3", short: "3ce Maj", name: "Tierce majeure", semitones: 4, diatonic: true, resolveTo: 4 },
+      { id: "4", degree: "4", short: "Quarte", name: "Quarte juste", semitones: 5, diatonic: true, resolveTo: 4 }, // 4 résout sur 3
+      { id: "b5", degree: "♯4 / ♭5", short: "Triton", name: "Quarte augm. / Triton", semitones: 6, diatonic: false, resolveTo: 7 }, // ♯4 résout sur 5
+      { id: "5", degree: "5", short: "Quinte", name: "Quinte juste", semitones: 7, diatonic: true, resolveTo: 7 },
+      { id: "b6", degree: "♭6", short: "6te min", name: "Sixte mineure", semitones: 8, diatonic: false, resolveTo: 7 }, // ♭6 résout sur 5
+      { id: "6", degree: "6", short: "6te Maj", name: "Sixte majeure", semitones: 9, diatonic: true, resolveTo: 7 }, // 6 descend sur 5
+      { id: "b7", degree: "♭7", short: "7e min", name: "Septième mineure", semitones: 10, diatonic: false, resolveTo: 9 },
+      { id: "7", degree: "7", short: "Sensible", name: "Sensible (7e majeure)", semitones: 11, diatonic: true, resolveTo: 12 } // 7 monte sur l'octave
     ];
 
     const NOTE_NAMES = ["Do", "Do♯ / Ré♭", "Ré", "Ré♯ / Mi♭", "Mi", "Fa", "Fa♯ / Sol♭", "Sol", "Sol♯ / La♭", "La", "La♯ / Si♭", "Si"];
 
-    function getCadenceMidis(tonicMidi) {
-      return [
-        [tonicMidi, tonicMidi + 7, tonicMidi + 12, tonicMidi + 16],
-        [tonicMidi + 5, tonicMidi + 9, tonicMidi + 12, tonicMidi + 17],
-        [tonicMidi + 7, tonicMidi + 7, tonicMidi + 11, tonicMidi + 14],
-        [tonicMidi, tonicMidi + 7, tonicMidi + 12, tonicMidi + 16]
-      ];
+    // --- BANQUE DE VOICINGS SATB (4 conduites mélodiques rigoureuses) ---
+    // Représentés en demi-tons relatifs par rapport à la tonique de basse (C3)
+    const VOICINGS_ROOT = [
+      // Pattern 1 : Soprano démarre sur la tierce (Mi) -> Fa -> Ré -> Mi
+      [
+        [0, 7, 12, 16],  // I  (Basse:0, Tenor:7, Alto:12, Sop:16)
+        [5, 9, 12, 17],  // IV (Basse:5, Tenor:9, Alto:12, Sop:17)
+        [7, 7, 11, 14],  // V  (Basse:7, Tenor:7, Alto:11, Sop:14)
+        [0, 7, 12, 16]   // I
+      ],
+      // Pattern 2 : Soprano démarre sur l'octave (Do) -> Do -> Si -> Do
+      [
+        [0, 4, 7, 12],   // I  (Basse:0, Tenor:4, Alto:7, Sop:12)
+        [5, 5, 9, 12],   // IV (Basse:5, Tenor:5, Alto:9, Sop:12)
+        [7, 2, 7, 11],   // V  (Basse:7, Tenor:2, Alto:7, Sop:11)
+        [0, 4, 7, 12]    // I
+      ],
+      // Pattern 3 : Soprano démarre sur la quinte (Sol) -> La -> Sol -> Sol
+      [
+        [0, 12, 16, 19], // I  (Basse:0, Tenor:12, Alto:16, Sop:19)
+        [5, 12, 17, 21], // IV (Basse:5, Tenor:12, Alto:17, Sop:21)
+        [7, 11, 14, 19], // V  (Basse:7, Tenor:11, Alto:14, Sop:19)
+        [0, 12, 16, 19]  // I
+      ],
+      // Pattern 4 : Voicing ouvert avec soprano descendant Mi -> Do -> Ré -> Do
+      [
+        [0, 7, 16, 19],  // I
+        [5, 9, 17, 17],  // IV
+        [7, 11, 14, 14], // V
+        [0, 7, 12, 16]   // I
+      ]
+    ];
+
+    // Variantes avec renversements à la basse (I - IV6 - V6 - I ou I - IV - V6/5 - I)
+    const VOICINGS_INVERTED = [
+      // Basse : Tonique -> 3ce de IV (La) -> Sensible (Si, 1er renv de V) -> Tonique
+      [
+        [0, 7, 12, 16],   // I fond
+        [9, 5, 12, 17],   // IV en 1er renversement (La à la basse)
+        [11, 7, 14, 17],  // V7 en 1er renversement (Si à la basse)
+        [12, 7, 12, 16]   // I
+      ],
+      // Basse : 3ce de I (Mi) -> Basse de IV -> Basse de V -> Tonique
+      [
+        [4, 7, 12, 16],   // I6 (Mi à la basse)
+        [5, 9, 12, 17],   // IV fond
+        [7, 7, 11, 14],   // V fond
+        [0, 7, 12, 16]    // I
+      ]
+    ];
+
+    function getRandomCadence(tonicMidi, allowInversions) {
+      let pool = VOICINGS_ROOT;
+      if (allowInversions && Math.random() > 0.45) {
+        pool = VOICINGS_INVERTED;
+      }
+      const pattern = pool[Math.floor(Math.random() * pool.length)];
+      return pattern.map(chord => chord.map(interval => tonicMidi + interval));
     }
 
+    // --- CONSTRUCTION DE L'INTERFACE ---
     const gridDirect = document.getElementById('grid-direct');
     const checkboxGrid = document.getElementById('checkbox-grid');
+    const gridQuizAnswers = document.getElementById('grid-quiz-answers');
+    const quizInstruction = document.getElementById('quiz-instruction');
 
+    // 1. Écoute ciblée
     DEGREES.forEach(deg => {
       const btn = document.createElement('button');
-      btn.className = 'btn-degree-direct';
+      btn.className = 'btn-degree';
       btn.innerHTML = `<strong>${deg.degree}</strong><span>${deg.short}</span>`;
       btn.addEventListener('click', () => playTargetDegreeDirect(deg));
       gridDirect.appendChild(btn);
     });
 
+    // 2. Cases à cocher des filtres
     DEGREES.forEach(deg => {
       const label = document.createElement('label');
       label.innerHTML = `
-        <input type="checkbox" data-id="${deg.id}" ${deg.diatonic ? 'checked' : ''}>
-        <span>${deg.degree} (${deg.short})</span>
-      `;
-      checkboxGrid.appendChild(label);
-    });
-
-    document.getElementById('btn-select-diatonic').addEventListener('click', () => {
-      DEGREES.forEach(d => {
-        document.querySelector(`input[data-id="${d.id}"]`).checked = d.diatonic;
-      });
-    });
-    document.getElementById('btn-select-all').addEventListener('click', () => {
-      DEGREES.forEach(d => {
-        document.querySelector(`input[data-id="${d.id}"]`).checked = true;
-      });
-    });
-    document.getElementById('btn-select-triad').addEventListener('click', () => {
-      DEGREES.forEach(d => {
-        document.querySelector(`input[data-id="${d.id}"]`).checked = ["1", "3", "5"].includes(d.id);
-      });
-    });
-
-    let currentTonic = null;
-    let currentDegree = null;
-    let currentTargetMidi = null;
-
-    const statusEl = document.getElementById('status');
-    const btnPlayQuiz = document.getElementById('btn-play-quiz');
-    const btnReplayAll = document.getElementById('btn-replay-all');
-    const btnReplayNote = document.getElementById('btn-replay-note');
-    const btnReveal = document.getElementById('btn-reveal');
-    const answerBox = document.getElementById('answer-box');
-    const ansDegree = document.getElementById('ans-degree');
-    const ansName = document.getElementById('ans-name');
-    const ansDetail = document.getElementById('ans-detail');
-
-    function setAllInteractiveDisabled(state) {
-      btnPlayQuiz.disabled = state;
-      btnReplayAll.disabled = state;
-      btnReplayNote.disabled = state;
-      btnReveal.disabled = state;
-      document.querySelectorAll('.btn-degree-direct').forEach(b => b.disabled = state);
-    }
-
-    function sequenceAudio(mode = 'quiz') {
-      initAudio();
-      setAllInteractiveDisabled(true);
-      if (mode === 'quiz') {
-        answerBox.style.display = 'none';
-      }
-
-      const now = actx.currentTime + 0.05;
-      statusEl.textContent = "Écoute de la cadence...";
-
-      const chords = getCadenceMidis(currentTonic.midi);
-      const chordStep = 1.0;
-      const chordDuration = 1.35;
-
-      chords.forEach((chord, idx) => {
-        const dur = (idx === 3) ? 1.8 : chordDuration;
-        playChord(chord, now + (idx * chordStep), dur);
-      });
-
-      const targetTime = now + (3 * chordStep) + 1.85;
-
-      setTimeout(() => {
-        if (mode === 'quiz') {
-          statusEl.textContent = "Quelle est cette note ?";
-        } else {
-          statusEl.textContent = `Écoute du degré : ${currentDegree.degree} (${currentDegree.name})`;
-        }
-      }, Math.max(0, (targetTime - now - 0.1) * 1000));
-
-      playTone(currentTargetMidi, targetTime, 2.5, 0.26);
-
-      setTimeout(() => {
-        setAllInteractiveDisabled(false);
-      }, (targetTime - now + 2.6) * 1000);
-    }
-
-    function playTargetDegreeDirect(deg) {
-      currentTonic = TONICS[Math.floor(Math.random() * TONICS.length)];
-      currentDegree = deg;
-      currentTargetMidi = currentTonic.midi + 12 + currentDegree.semitones;
-
-      ansDegree.textContent = currentDegree.degree;
-      ansName.textContent = currentDegree.name;
-      const noteName = NOTE_NAMES[currentTargetMidi % 12];
-      ansDetail.textContent = `Tonalité : ${currentTonic.name} majeur | Note : ${noteName}`;
-      answerBox.style.display = 'block';
-
-      sequenceAudio('direct');
-    }
-
-    btnPlayQuiz.addEventListener('click', () => {
-      const checkedIds = Array.from(document.querySelectorAll('#checkbox-grid input:checked')).map(el => el.dataset.id);
-
-      if (checkedIds.length === 0) {
-        alert("Coche au moins un degré dans les filtres ci-dessus !");
-        return;
-      }
-
-      const pool = DEGREES.filter(d => checkedIds.includes(d.id));
-      currentTonic = TONICS[Math.floor(Math.random() * TONICS.length)];
-      currentDegree = pool[Math.floor(Math.random() * pool.length)];
-      currentTargetMidi = currentTonic.midi + 12 + currentDegree.semitones;
-
-      sequenceAudio('quiz');
-    });
-
-    btnReplayAll.addEventListener('click', () => {
-      if (!currentTonic) return;
-      sequenceAudio('replay');
-    });
-
-    btnReplayNote.addEventListener('click', () => {
-      if (!currentTargetMidi) return;
-      initAudio();
-      statusEl.textContent = "Note seule...";
-      playTone(currentTargetMidi, actx.currentTime + 0.05, 2.5, 0.26);
-    });
-
-    btnReveal.addEventListener('click', () => {
-      if (!currentDegree) return;
-      ansDegree.textContent = currentDegree.degree;
-      ansName.textContent = currentDegree.name;
-      const noteName = NOTE_NAMES[currentTargetMidi % 12];
-      ansDetail.textContent = `Tonalité : ${currentTonic.name} majeur | Note jouée : ${noteName}`;
-      answerBox.style.display = 'block';
-      statusEl.textContent = "Résultat affiché";
-    });
-  </script>
-</body>
-</html>
+        <input type="checkbox" data-id="${deg.id}" ${deg.diatonic
