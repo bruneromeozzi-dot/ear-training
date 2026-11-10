@@ -490,17 +490,29 @@
         filter.frequency.setValueAtTime(3200, startTime);
         filter.frequency.exponentialRampToValueAtTime(800, startTime + duration * 0.8);
 
-      } else if (timbre === 'marimba') {
-        osc1.type = 'sine'; osc2.type = 'sine'; osc3.type = 'triangle';
+     } else if (timbre === 'marimba') {
+        // Fondamentale douce + octave courte (plus d'harmonique désaccordée)
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        osc3.type = 'triangle';
+
         osc1.frequency.setValueAtTime(freq, startTime);
-        osc2.frequency.setValueAtTime(freq * 3.8, startTime); // partiel inharmonique boisé
-        osc3.frequency.setValueAtTime(freq * 2, startTime);
-        gainOsc2.gain.setValueAtTime(0.18, startTime);
+        osc2.frequency.setValueAtTime(freq * 2, startTime); // Octave pure
+        osc3.frequency.setValueAtTime(freq * 4, startTime); // Double octave très discrète
+
+        gainOsc2.gain.setValueAtTime(0.35, startTime);
+        // L'harmonique supérieure s'éteint immédiatement (claquement du maillet)
+        gainOsc2.gain.exponentialRampToValueAtTime(0.001, startTime + 0.12);
+
         gainOsc3.gain.setValueAtTime(0.12, startTime);
-        attack = 0.008; release = 0.5;
+        gainOsc3.gain.exponentialRampToValueAtTime(0.001, startTime + 0.05);
+
+        attack = 0.005; 
+        release = 0.7; // La fondamentale seule résonne proprement
+
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(2200, startTime);
-        filter.frequency.exponentialRampToValueAtTime(600, startTime + 0.3);
+        filter.frequency.setValueAtTime(2400, startTime);
+        filter.frequency.exponentialRampToValueAtTime(600, startTime + 0.25);
 
       } else if (timbre === 'strings') {
         // Désaccord subtil (Chorus naturel)
