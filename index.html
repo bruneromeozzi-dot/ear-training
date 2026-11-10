@@ -125,11 +125,31 @@
       text-align: left;
     }
 
+    /* Options d'écoute ciblée */
+    .direct-options-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
+    }
+    .direct-options-bar label {
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     .grid-degrees {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     .btn-degree {
       background: #f1f5f9;
@@ -152,6 +172,12 @@
     }
     .btn-degree:hover { background: #e2e8f0; }
     .btn-degree:active { transform: scale(0.97); }
+
+    .direct-actions-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
 
     .grid-quiz-answers {
       display: grid;
@@ -270,10 +296,10 @@
       background: #047857;
       color: #fff;
       border: none;
-      padding: 11px 16px;
+      padding: 12px 16px;
       border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.92rem;
+      font-weight: 700;
       cursor: pointer;
       margin-top: 8px;
       display: none;
@@ -315,9 +341,9 @@
 
   <div class="container">
     <h1>Ear Training Tonale</h1>
-    <p class="subtitle">Méthode Bruce Arnold — Ressentir le degré</p>
+    <p class="subtitle">Méthode Bruce Arnold — Perception relative des degrés</p>
 
-    <!-- OPTIONS -->
+    <!-- BARRE D'OPTIONS GLOBALES -->
     <div class="controls-bar">
       <div class="control-item">
         <label for="select-timbre">Sonorité :</label>
@@ -331,20 +357,42 @@
         </select>
       </div>
       <div class="control-item">
-        <label>Accords de la cadence :</label>
+        <label for="select-mode">Mode harmonique :</label>
+        <select id="select-mode">
+          <option value="major">Majeur (I - IV - V - I)</option>
+          <option value="minor">Mineur (i - iv - V - i)</option>
+        </select>
         <label class="toggle-wrapper">
           <input type="checkbox" id="check-inversions">
-          <span>Autoriser renversements</span>
+          <span>Renversements basse</span>
         </label>
       </div>
     </div>
 
-    <div class="status" id="status">Prêt. Clique sur « Nouvelle écoute »</div>
+    <div class="status" id="status">Prêt. Choisis une action ci-dessous.</div>
     <div class="score-badge" id="score-badge">Score Quiz : 0 / 0 (0%)</div>
 
     <!-- 1. ÉCOUTE CIBLÉE -->
     <div class="section-title">1. Écoute ciblée (apprivoiser la sensation)</div>
+    
+    <div class="direct-options-bar">
+      <span>Mode de jeu :</span>
+      <label>
+        <input type="radio" name="direct-mode" value="manual" checked>
+        <span>Manuel (je chante dans ma tête d'abord)</span>
+      </label>
+      <label>
+        <input type="radio" name="direct-mode" value="auto">
+        <span>Automatique</span>
+      </label>
+    </div>
+
     <div class="grid-degrees" id="grid-direct"></div>
+
+    <div class="direct-actions-row">
+      <button class="btn-sub" id="btn-direct-replay-cadence" disabled>🔁 Rejouer la cadence seule</button>
+      <button class="btn-sub" id="btn-direct-play-note" disabled>🎵 Jouer la note cible</button>
+    </div>
 
     <!-- 2. QUIZ INTERACTIF -->
     <div class="section-title">2. Quiz à l'aveugle</div>
@@ -352,8 +400,8 @@
     <div class="filter-box">
       <div style="font-weight: 600; font-size: 0.78rem; margin-bottom: 6px;">Filtre des degrés pour le quiz :</div>
       <div class="filter-actions">
-        <button class="btn-tag" id="btn-select-diatonic">Diatonique majeur (1 à 7)</button>
-        <button class="btn-tag" id="btn-select-triad">Accords 1 - 3 - 5</button>
+        <button class="btn-tag" id="btn-select-diatonic">Diatonique de l'accord</button>
+        <button class="btn-tag" id="btn-select-triad">Accord 1 - 3 - 5</button>
         <button class="btn-tag" id="btn-select-all">Tout cocher</button>
         <button class="btn-tag" id="btn-deselect-all">Tout décocher</button>
       </div>
@@ -428,6 +476,7 @@
     }
 
     const selectTimbre = document.getElementById('select-timbre');
+    const selectMode = document.getElementById('select-mode');
 
     function playTone(midi, startTime, duration = 1.6, velocity = 0.22) {
       const timbre = selectTimbre.value;
@@ -551,38 +600,47 @@
     ];
 
     const DEGREES = [
-      { id: "1", degree: "1", short: "Tonique", name: "Tonique", semitones: 0, diatonic: true, resolveTo: 0, isStable: true },
-      { id: "b2", degree: "♭2", short: "2de min", name: "Seconde mineure", semitones: 1, diatonic: false, resolveTo: 0, isStable: false },
-      { id: "2", degree: "2", short: "2de Maj", name: "Seconde majeure", semitones: 2, diatonic: true, resolveTo: 0, isStable: false },
-      { id: "b3", degree: "♭3", short: "3ce min", name: "Tierce mineure", semitones: 3, diatonic: false, resolveTo: 4, isStable: false },
-      { id: "3", degree: "3", short: "3ce Maj", name: "Tierce majeure", semitones: 4, diatonic: true, resolveTo: 4, isStable: true },
-      { id: "4", degree: "4", short: "Quarte", name: "Quarte juste", semitones: 5, diatonic: true, resolveTo: 4, isStable: false },
-      { id: "b5", degree: "♯4 / ♭5", short: "Triton", name: "Quarte augm. / Triton", semitones: 6, diatonic: false, resolveTo: 7, isStable: false },
-      { id: "5", degree: "5", short: "Quinte", name: "Quinte juste", semitones: 7, diatonic: true, resolveTo: 7, isStable: true },
-      { id: "b6", degree: "♭6", short: "6te min", name: "Sixte mineure", semitones: 8, diatonic: false, resolveTo: 7, isStable: false },
-      { id: "6", degree: "6", short: "6te Maj", name: "Sixte majeure", semitones: 9, diatonic: true, resolveTo: 7, isStable: false },
-      { id: "b7", degree: "♭7", short: "7e min", name: "Septième mineure", semitones: 10, diatonic: false, resolveTo: 9, isStable: false },
-      { id: "7", degree: "7", short: "Sensible", name: "Sensible (7e majeure)", semitones: 11, diatonic: true, resolveTo: 12, isStable: false }
+      { id: "1", degree: "1", short: "Tonique", name: "Tonique", semitones: 0, diatonicMaj: true, diatonicMin: true, resolveToMaj: 0, resolveToMin: 0, stableMaj: true, stableMin: true },
+      { id: "b2", degree: "♭2", short: "2de min", name: "Seconde mineure", semitones: 1, diatonicMaj: false, diatonicMin: false, resolveToMaj: 0, resolveToMin: 0, stableMaj: false, stableMin: false },
+      { id: "2", degree: "2", short: "2de Maj", name: "Seconde majeure", semitones: 2, diatonicMaj: true, diatonicMin: true, resolveToMaj: 0, resolveToMin: 0, stableMaj: false, stableMin: false },
+      { id: "b3", degree: "♭3", short: "3ce min", name: "Tierce mineure", semitones: 3, diatonicMaj: false, diatonicMin: true, resolveToMaj: 4, resolveToMin: 3, stableMaj: false, stableMin: true },
+      { id: "3", degree: "3", short: "3ce Maj", name: "Tierce majeure", semitones: 4, diatonicMaj: true, diatonicMin: false, resolveToMaj: 4, resolveToMin: 3, stableMaj: true, stableMin: false },
+      { id: "4", degree: "4", short: "Quarte", name: "Quarte juste", semitones: 5, diatonicMaj: true, diatonicMin: true, resolveToMaj: 4, resolveToMin: 3, stableMaj: false, stableMin: false },
+      { id: "b5", degree: "♯4 / ♭5", short: "Triton", name: "Quarte augm. / Triton", semitones: 6, diatonicMaj: false, diatonicMin: false, resolveToMaj: 7, resolveToMin: 7, stableMaj: false, stableMin: false },
+      { id: "5", degree: "5", short: "Quinte", name: "Quinte juste", semitones: 7, diatonicMaj: true, diatonicMin: true, resolveToMaj: 7, resolveToMin: 7, stableMaj: true, stableMin: true },
+      { id: "b6", degree: "♭6", short: "6te min", name: "Sixte mineure", semitones: 8, diatonicMaj: false, diatonicMin: true, resolveToMaj: 7, resolveToMin: 7, stableMaj: false, stableMin: false },
+      { id: "6", degree: "6", short: "6te Maj", name: "Sixte majeure", semitones: 9, diatonicMaj: true, diatonicMin: false, resolveToMaj: 7, resolveToMin: 7, stableMaj: false, stableMin: false },
+      { id: "b7", degree: "♭7", short: "7e min", name: "Septième sous-tonique", semitones: 10, diatonicMaj: false, diatonicMin: false, resolveToMaj: 9, resolveToMin: 8, stableMaj: false, stableMin: false },
+      { id: "7", degree: "7", short: "Sensible", name: "Sensible (7e majeure)", semitones: 11, diatonicMaj: true, diatonicMin: true, resolveToMaj: 12, resolveToMin: 12, stableMaj: false, stableMin: false }
     ];
 
     const NOTE_NAMES = ["Do", "Do♯ / Ré♭", "Ré", "Ré♯ / Mi♭", "Mi", "Fa", "Fa♯ / Sol♭", "Sol", "Sol♯ / La♭", "La", "La♯ / Si♭", "Si"];
 
-    const VOICINGS_ROOT = [
+    const VOICINGS_MAJOR_ROOT = [
       [[0, 7, 12, 16], [5, 9, 12, 17], [7, 7, 11, 14], [0, 7, 12, 16]],
       [[0, 4, 7, 12], [5, 5, 9, 12], [7, 2, 7, 11], [0, 4, 7, 12]],
       [[0, 12, 16, 19], [5, 12, 17, 21], [7, 11, 14, 19], [0, 12, 16, 19]],
       [[0, 7, 16, 19], [5, 9, 17, 17], [7, 11, 14, 14], [0, 7, 12, 16]]
     ];
-
-    const VOICINGS_INVERTED = [
+    const VOICINGS_MAJOR_INV = [
       [[0, 7, 12, 16], [9, 5, 12, 17], [11, 7, 14, 17], [12, 7, 12, 16]],
       [[4, 7, 12, 16], [5, 9, 12, 17], [7, 7, 11, 14], [0, 7, 12, 16]]
     ];
 
-    function getRandomCadence(tonicMidi, allowInversions) {
-      let pool = VOICINGS_ROOT;
+    const VOICINGS_MINOR_ROOT = [
+      [[0, 7, 12, 15], [5, 8, 12, 17], [7, 7, 11, 14], [0, 7, 12, 15]],
+      [[0, 3, 7, 12], [5, 5, 8, 12], [7, 2, 7, 11], [0, 3, 7, 12]],
+      [[0, 12, 15, 19], [5, 12, 17, 20], [7, 11, 14, 19], [0, 12, 15, 19]]
+    ];
+    const VOICINGS_MINOR_INV = [
+      [[0, 7, 12, 15], [8, 5, 12, 17], [11, 7, 14, 17], [12, 7, 12, 15]],
+      [[3, 7, 12, 15], [5, 8, 12, 17], [7, 7, 11, 14], [0, 7, 12, 15]]
+    ];
+
+    function getRandomCadence(tonicMidi, isMinor, allowInversions) {
+      let pool = isMinor ? VOICINGS_MINOR_ROOT : VOICINGS_MAJOR_ROOT;
       if (allowInversions && Math.random() > 0.45) {
-        pool = VOICINGS_INVERTED;
+        pool = isMinor ? VOICINGS_MINOR_INV : VOICINGS_MAJOR_INV;
       }
       const pattern = pool[Math.floor(Math.random() * pool.length)];
       return pattern.map(chord => chord.map(interval => tonicMidi + interval));
@@ -597,29 +655,39 @@
       const btn = document.createElement('button');
       btn.className = 'btn-degree';
       btn.innerHTML = `<strong>${deg.degree}</strong><span>${deg.short}</span>`;
-      btn.addEventListener('click', () => playTargetDegreeDirect(deg));
+      btn.addEventListener('click', () => handleDirectDegreeClick(deg));
       gridDirect.appendChild(btn);
     });
 
     DEGREES.forEach(deg => {
       const label = document.createElement('label');
       label.innerHTML = `
-        <input type="checkbox" data-id="${deg.id}" ${deg.diatonic ? 'checked' : ''}>
+        <input type="checkbox" data-id="${deg.id}" ${deg.diatonicMaj ? 'checked' : ''}>
         <span>${deg.degree} (${deg.short})</span>
       `;
       checkboxGrid.appendChild(label);
     });
 
-    document.getElementById('btn-select-diatonic').addEventListener('click', () => {
-      DEGREES.forEach(d => document.querySelector(`input[data-id="${d.id}"]`).checked = d.diatonic);
+    function applyDiatonicFilter() {
+      const isMinor = selectMode.value === 'minor';
+      DEGREES.forEach(d => {
+        const shouldCheck = isMinor ? d.diatonicMin : d.diatonicMaj;
+        document.querySelector(`input[data-id="${d.id}"]`).checked = shouldCheck;
+      });
       buildQuizButtons();
-    });
+    }
+
+    document.getElementById('btn-select-diatonic').addEventListener('click', applyDiatonicFilter);
+    selectMode.addEventListener('change', applyDiatonicFilter);
+
     document.getElementById('btn-select-all').addEventListener('click', () => {
       DEGREES.forEach(d => document.querySelector(`input[data-id="${d.id}"]`).checked = true);
       buildQuizButtons();
     });
     document.getElementById('btn-select-triad').addEventListener('click', () => {
-      DEGREES.forEach(d => document.querySelector(`input[data-id="${d.id}"]`).checked = ["1", "3", "5"].includes(d.id));
+      const isMinor = selectMode.value === 'minor';
+      const triadIds = isMinor ? ["1", "b3", "5"] : ["1", "3", "5"];
+      DEGREES.forEach(d => document.querySelector(`input[data-id="${d.id}"]`).checked = triadIds.includes(d.id));
       buildQuizButtons();
     });
     document.getElementById('btn-deselect-all').addEventListener('click', () => {
@@ -648,6 +716,7 @@
     let currentTonic = null;
     let currentDegree = null;
     let currentTargetMidi = null;
+    let currentIsMinor = false;
     let quizAnswered = false;
     let scoreTotal = 0;
     let scoreCorrect = 0;
@@ -655,6 +724,12 @@
     const statusEl = document.getElementById('status');
     const scoreBadge = document.getElementById('score-badge');
     const checkInversions = document.getElementById('check-inversions');
+    
+    // Commandes Partie 1
+    const btnDirectReplayCadence = document.getElementById('btn-direct-replay-cadence');
+    const btnDirectPlayNote = document.getElementById('btn-direct-play-note');
+
+    // Commandes Quiz
     const btnPlayQuiz = document.getElementById('btn-play-quiz');
     const btnReplayAll = document.getElementById('btn-replay-all');
     const btnReplayNote = document.getElementById('btn-replay-note');
@@ -670,18 +745,88 @@
       scoreBadge.textContent = `Score Quiz : ${scoreCorrect} / ${scoreTotal} (${pct}%)`;
     }
 
-    function setInteractiveDisabled(state) {
+    function setAllInteractiveDisabled(state) {
       btnPlayQuiz.disabled = state;
       btnReplayAll.disabled = state;
       btnReplayNote.disabled = state;
       btnReveal.disabled = state;
+      btnDirectReplayCadence.disabled = state;
+      btnDirectPlayNote.disabled = state;
       document.querySelectorAll('.btn-degree').forEach(b => b.disabled = state);
       document.querySelectorAll('.btn-quiz-choice').forEach(b => b.disabled = state || quizAnswered);
     }
 
+    // Joue la cadence seule (SATB)
+    function playCadenceOnly(onComplete) {
+      initAudio();
+      setAllInteractiveDisabled(true);
+      statusEl.textContent = "Écoute de la cadence...";
+
+      const now = actx.currentTime + 0.05;
+      const chords = getRandomCadence(currentTonic.midi, currentIsMinor, checkInversions.checked);
+      const chordStep = 0.95;
+      const chordDuration = 1.35;
+
+      chords.forEach((chord, idx) => {
+        const dur = (idx === 3) ? 1.8 : chordDuration;
+        playChord(chord, now + (idx * chordStep), dur);
+      });
+
+      const totalTime = (3 * chordStep) + 1.9;
+      setTimeout(() => {
+        setAllInteractiveDisabled(false);
+        if (onComplete) onComplete();
+      }, totalTime * 1000);
+    }
+
+    // Gestion du clic en Partie 1 (Écoute ciblée)
+    function handleDirectDegreeClick(deg) {
+      currentTonic = TONICS[Math.floor(Math.random() * TONICS.length)];
+      currentIsMinor = (selectMode.value === 'minor');
+      currentDegree = deg;
+      currentTargetMidi = currentTonic.midi + 12 + currentDegree.semitones;
+
+      revealAnswer(false);
+      btnResolve.style.display = 'inline-block';
+      quizInstruction.style.display = 'none';
+
+      const mode = document.querySelector('input[name="direct-mode"]:checked').value;
+
+      if (mode === 'manual') {
+        // Mode Pas à Pas : joue la cadence, puis laisse l'élève imaginer
+        playCadenceOnly(() => {
+          statusEl.textContent = `Cadence posée ! Chante intérieurement : ${currentDegree.degree} (${currentDegree.name})`;
+          btnDirectReplayCadence.disabled = false;
+          btnDirectPlayNote.disabled = false;
+        });
+      } else {
+        // Mode Automatique : cadence -> pause nette -> note cible
+        sequenceAudio('direct');
+      }
+    }
+
+    // Rejouer la cadence seule en Partie 1
+    btnDirectReplayCadence.addEventListener('click', () => {
+      if (!currentTonic) return;
+      playCadenceOnly(() => {
+        statusEl.textContent = `Cadence rejouée ! Imagine le degré ${currentDegree.degree}...`;
+        btnDirectReplayCadence.disabled = false;
+        btnDirectPlayNote.disabled = false;
+      });
+    });
+
+    // Jouer la note cible seule en Partie 1
+    btnDirectPlayNote.addEventListener('click', () => {
+      if (!currentTargetMidi) return;
+      initAudio();
+      statusEl.textContent = `Écoute de la note : ${currentDegree.degree} (${currentDegree.name})`;
+      playTone(currentTargetMidi, actx.currentTime + 0.05, 2.6, 0.28);
+    });
+
+    // Séquenceur complet pour Quiz et Direct Auto
     function sequenceAudio(mode = 'quiz') {
       initAudio();
-      setInteractiveDisabled(true);
+      setAllInteractiveDisabled(true);
       btnResolve.style.display = 'none';
 
       if (mode === 'quiz') {
@@ -697,7 +842,7 @@
       const now = actx.currentTime + 0.05;
       statusEl.textContent = "Écoute de la cadence...";
 
-      const chords = getRandomCadence(currentTonic.midi, checkInversions.checked);
+      const chords = getRandomCadence(currentTonic.midi, currentIsMinor, checkInversions.checked);
       const chordStep = 0.95;
       const chordDuration = 1.35;
 
@@ -706,7 +851,6 @@
         playChord(chord, now + (idx * chordStep), dur);
       });
 
-      // Silence allongé : le dernier accord s'éteint complètement + 2,2s de vrai silence respiratoire
       const silenceExtra = (mode === 'direct') ? 2.6 : 1.9;
       const targetTime = now + (3 * chordStep) + silenceExtra;
 
@@ -721,11 +865,13 @@
       playTone(currentTargetMidi, targetTime, 2.5, 0.26);
 
       setTimeout(() => {
-        setInteractiveDisabled(false);
+        setAllInteractiveDisabled(false);
         if (mode === 'quiz') {
           document.querySelectorAll('.btn-quiz-choice').forEach(b => b.disabled = false);
         } else {
           btnResolve.style.display = 'inline-block';
+          btnDirectReplayCadence.disabled = false;
+          btnDirectPlayNote.disabled = false;
         }
       }, (targetTime - now + 2.5) * 1000);
     }
@@ -757,58 +903,53 @@
       ansDegree.textContent = currentDegree.degree;
       ansName.textContent = currentDegree.name;
       const noteName = NOTE_NAMES[currentTargetMidi % 12];
-      ansDetail.textContent = `Tonalité : ${currentTonic.name} majeur | Note jouée : ${noteName}`;
+      const modeTxt = currentIsMinor ? "mineur" : "majeur";
+      ansDetail.textContent = `Tonalité : ${currentTonic.name} ${modeTxt} | Note jouée : ${noteName}`;
       answerBox.style.display = 'block';
       btnResolve.style.display = 'inline-block';
       if (updateStatusText) statusEl.textContent = "Résultat affiché";
     }
 
-    // RÉSOLUTION AVEC FROTTEMENT HARMONIQUE RÉEL SUR L'ACCORD DE TONIQUE
+    // RÉSOLUTION CORRIGÉE (La note stable continue jusqu'au bout de l'accord)
     btnResolve.addEventListener('click', () => {
       if (!currentTargetMidi || !currentDegree) return;
       initAudio();
       const now = actx.currentTime + 0.05;
-      const tonicChord = [currentTonic.midi, currentTonic.midi + 7, currentTonic.midi + 12, currentTonic.midi + 16];
+      
+      const thirdOffset = currentIsMinor ? 3 : 4;
+      const tonicChord = [currentTonic.midi, currentTonic.midi + 7, currentTonic.midi + 12, currentTonic.midi + 12 + thirdOffset];
+      const isStable = currentIsMinor ? currentDegree.stableMin : currentDegree.stableMaj;
+      const resolveTo = currentIsMinor ? currentDegree.resolveToMin : currentDegree.resolveToMaj;
 
-      // 1. La note mystère retentit seule d'abord
+      // 1. La note mystère démarre seule
       statusEl.textContent = `Note seule (${currentDegree.degree})...`;
-      playTone(currentTargetMidi, now, 1.2, 0.26);
+      playTone(currentTargetMidi, now, 1.85, 0.26);
 
-      // 2. L'accord de tonique entre en dessous (doux) ALORS QUE la note mystère continue de frotter par-dessus
-      const chordStart = now + 1.1;
-      setTimeout(() => {
-        statusEl.textContent = `Frottement avec l'accord parfait de tonique...`;
-      }, 1100);
-      playChord(tonicChord, chordStart, 3.2, 0.08); // Accord tenu en fond doux
-      playTone(currentTargetMidi, chordStart, 1.2, 0.25); // Note mystère qui frotte sur l'accord
+      // 2. L'accord parfait de tonique entre en dessous SANS couper la note mystère
+      const chordStart = now + 1.8;
+      playChord(tonicChord, chordStart, 4.2, 0.08); // L'accord résonne en fond
 
-      // 3. Résolution mélodique pendant que l'accord résonne toujours
-      const resolveTime = chordStart + 1.1;
-      if (currentDegree.isStable) {
+      if (isStable) {
+        // NOTE CONSONANTE (1, 3, 5) : la note continue exactement pendant toute la durée de l'accord
         setTimeout(() => {
-          statusEl.textContent = `Accord parfait complet (degré stable).`;
-        }, 2200);
+          statusEl.textContent = `Note consonante (${currentDegree.degree}) en pleine harmonie avec l'accord !`;
+        }, 1800);
+        playTone(currentTargetMidi, chordStart, 4.2, 0.25);
       } else {
-        const resolveMidi = currentTonic.midi + 12 + currentDegree.resolveTo;
+        // NOTE DISSONANTE : elle frotte d'abord (1,8s) puis glisse vers la résolution
+        setTimeout(() => {
+          statusEl.textContent = `Frottement de tension sur l'accord...`;
+        }, 1800);
+        playTone(currentTargetMidi, chordStart, 1.85, 0.25);
+
+        const resolveTime = chordStart + 1.8;
+        const resolveMidi = currentTonic.midi + 12 + resolveTo;
         setTimeout(() => {
           statusEl.textContent = `Résolution : ${currentDegree.degree} ➜ note de repos !`;
-        }, 2200);
-        playTone(resolveMidi, resolveTime, 2.2, 0.28);
+        }, 3600);
+        playTone(resolveMidi, resolveTime, 2.5, 0.28);
       }
     });
-
-    function playTargetDegreeDirect(deg) {
-      currentTonic = TONICS[Math.floor(Math.random() * TONICS.length)];
-      currentDegree = deg;
-      currentTargetMidi = currentTonic.midi + 12 + currentDegree.semitones;
-
-      revealAnswer(false);
-      quizInstruction.style.display = 'none';
-      gridQuizAnswers.innerHTML = '';
-      buildQuizButtons();
-
-      sequenceAudio('direct');
-    }
 
     btnPlayQuiz.addEventListener('click', () => {
       const checkedIds = Array.from(document.querySelectorAll('#checkbox-grid input:checked')).map(el => el.dataset.id);
@@ -820,8 +961,12 @@
 
       const pool = DEGREES.filter(d => checkedIds.includes(d.id));
       currentTonic = TONICS[Math.floor(Math.random() * TONICS.length)];
+      currentIsMinor = (selectMode.value === 'minor');
       currentDegree = pool[Math.floor(Math.random() * pool.length)];
       currentTargetMidi = currentTonic.midi + 12 + currentDegree.semitones;
+
+      btnDirectReplayCadence.disabled = true;
+      btnDirectPlayNote.disabled = true;
 
       sequenceAudio('quiz');
     });
