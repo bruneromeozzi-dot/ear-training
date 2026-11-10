@@ -657,4 +657,228 @@
     DEGREES.forEach(deg => {
       const label = document.createElement('label');
       label.innerHTML = `
-        <input type="checkbox" data-id="${deg.id}" ${deg.diatonic
+        <input type="checkbox" data-id="${deg.id}" ${deg.diatonic ? 'checked' : ''}>
+        <span>${deg.degree} (${deg.short})</span>
+      `;
+      checkboxGrid.appendChild(label);
+    });
+
+    document.getElementById('btn-select-diatonic').addEventListener('click', () => {
+      DEGREES.forEach(d => document.querySelector(`input[data-id="${d.id}"]`).checked = d.diatonic);
+      buildQuizButtons();
+    });
+    document.getElementById('btn-select-all').addEventListener('click', () => {
+      DEGREES.forEach(d => document.querySelector(`input[data-id="${d.id}"]`).checked = true);
+      buildQuizButtons();
+    });
+    document.getElementById('btn-select-triad').addEventListener('click', () => {
+      DEGREES.forEach(d => document.querySelector(`input[data-id="${d.id}"]`).checked = ["1", "3", "5"].includes(d.id));
+      buildQuizButtons();
+    });
+
+    checkboxGrid.addEventListener('change', buildQuizButtons);
+
+    // 3. Grille de réponse interactive du Quiz
+    function buildQuizButtons() {
+      gridQuizAnswers.innerHTML = '';
+      const checkedIds = Array.from(document.querySelectorAll('#checkbox-grid input:checked')).map(el => el.dataset.id);
+      const activeDegrees = DEGREES.filter(d => checkedIds.includes(d.id));
+
+      activeDegrees.forEach(deg => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-quiz-choice';
+        btn.dataset.id = deg.id;
+        btn.innerHTML = `<strong>${deg.degree}</strong><span>${deg.short}</span>`;
+        btn.addEventListener('click', () => checkAnswer(deg, btn));
+        gridQuizAnswers.appendChild(btn);
+      });
+    }
+    buildQuizButtons();
+
+    // --- ÉTAT DU LECTEUR ET STATISTIQUES ---
+    let currentTonic = null;
+    let currentDegree = null;
+    let currentTargetMidi = null;
+    let quizAnswered = false;
+    let scoreTotal = 0;
+    let scoreCorrect = 0;
+
+    const statusEl = document.getElementById('status');
+    const scoreBadge = document.getElementById('score-badge');
+    const checkInversions = document.getElementById('check-inversions');
+    const btnPlayQuiz = document.getElementById('btn-play-quiz');
+    const btnReplayAll = document.getElementById('btn-replay-all');
+    const btnReplayNote = document.getElementById('btn-replay-note');
+    const btnReveal = document.getElementById('btn-reveal');
+    const btnResolve = document.getElementById('btn-resolve');
+    const answerBox = document.getElementById('answer-box');
+    const ansDegree = document.getElementById('ans-degree');
+    const ansName = document.getElementById('ans-name');
+    const ansDetail = document.getElementById('ans-detail');
+
+    function updateScoreDisplay() {
+      const pct = scoreTotal === 0 ? 0 : Math.round((scoreCorrect / scoreTotal) * 100);
+      scoreBadge.textContent = `Score Quiz : ${scoreCorrect} / ${scoreTotal} (${pct}%)`;
+    }
+
+    function setInteractiveDisabled(state) {
+      btnPlayQuiz.disabled = state;
+      btnReplayAll.disabled = state;
+      btnReplayNote.disabled = state;
+      btnReveal.disabled = state;
+      document.querySelectorAll('.btn-degree').forEach(b => b.disabled = state);
+      document.querySelectorAll('.btn-quiz-choice').forEach(b => b.disabled = state || quizAnswered);
+    }
+
+    // Séquenceur polyphonique fluide
+    function sequenceAudio(mode = 'quiz') {
+      initAudio();
+      setInteractiveDisabled(true);
+      btnResolve.style.display = 'none';
+
+      if (mode === 'quiz') {
+        quizAnswered = false;
+        answerBox.style.display = 'none';
+        quizInstruction.style.display = 'block';
+        document.querySelectorAll('.btn-quiz-choice').forEach(b => {
+          b.className = 'btn-quiz-choice';
+          b.disabled = true;
+        });
+      }
+
+      const now = actx.currentTime + 0.05;
+      statusEl.textContent = "Écoute de la cadence...";
+
+      // Tirage du voicing SATB aléatoire
+      const chords = getRandomCadence(currentTonic.midi, checkInversions.checked);
+      const chordStep = 0.95;
+      const chordDuration = 1.35;
+
+      chords.forEach((chord, idx) => {
+        const dur = (idx === 3) ? 1.8 : chordDuration;
+        playChord(chord, now + (idx * chordStep), dur);
+      });
+
+      const targetTime = now + (3 * chordStep) + 1.8;
+
+      setTimeout(() => {
+        if (mode === 'quiz') {
+          statusEl.textContent = "Quelle est cette note ?";
+        } else {
+          statusEl.textContent = `Écoute du degré : ${currentDegree.degree} (${currentDegree.name})`;
+        }
+      }, Math.max(0, (targetTime - now - 0.1) * 1000));
+
+      // Note cible chantante tenue 2.5 secondes
+      playTone(currentTargetMidi, targetTime, 2.5, 0.26);
+
+      setTimeout(() => {
+        setInteractiveDisabled(false);
+        if (mode === 'quiz') {
+          document.querySelectorAll('.btn-quiz-choice').forEach(b => b.disabled = false);
+        } else {
+          btnResolve.style.display = 'inline-block';
+        }
+      }, (targetTime - now + 2.5) * 1000);
+    }
+
+    // Validation du choix dans le Quiz
+    function checkAnswer(chosenDegree, buttonEl) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+      scoreTotal++;
+
+      const isCorrect = (chosenDegree.id === currentDegree.id);
+      if (isCorrect) {
+        scoreCorrect++;
+        buttonEl.classList.add('correct');
+        statusEl.textContent = "Bravo, c'est exact !";
+      } else {
+        buttonEl.classList.add('wrong');
+        // Mettre en vert le bon bouton
+        const correctBtn = document.querySelector(`.btn-quiz-choice[data-id="${currentDegree.id}"]`);
+        if (correctBtn) correctBtn.classList.add('correct');
+        statusEl.textContent = `Erreur : c'était le degré ${currentDegree.degree} (${currentDegree.short})`;
+      }
+
+      updateScoreDisplay();
+      revealAnswer(false);
+      btnResolve.style.display = 'inline-block';
+      document.querySelectorAll('.btn-quiz-choice').forEach(b => b.disabled = true);
+    }
+
+    function revealAnswer(updateStatusText = true) {
+      ansDegree.textContent = currentDegree.degree;
+      ansName.textContent = currentDegree.name;
+      const noteName = NOTE_NAMES[currentTargetMidi % 12];
+      ansDetail.textContent = `Tonalité : ${currentTonic.name} majeur | Note jouée : ${noteName}`;
+      answerBox.style.display = 'block';
+      btnResolve.style.display = 'inline-block';
+      if (updateStatusText) statusEl.textContent = "Résultat affiché";
+    }
+
+    // Résolution mélodique de la note
+    btnResolve.addEventListener('click', () => {
+      if (!currentTargetMidi || !currentDegree) return;
+      initAudio();
+      const now = actx.currentTime + 0.05;
+      const resolveMidi = currentTonic.midi + 12 + currentDegree.resolveTo;
+
+      statusEl.textContent = `Résolution : ${currentDegree.degree} ➜ repos tonal`;
+      // Rejoue la note cible brièvement puis glisse vers la note de repos
+      playTone(currentTargetMidi, now, 0.9, 0.25);
+      playTone(resolveMidi, now + 0.85, 2.0, 0.28);
+    });
+
+    function playTargetDegreeDirect(deg) {
+      currentTonic = TONICS[Math.floor(Math.random() * TONICS.length)];
+      currentDegree = deg;
+      currentTargetMidi = currentTonic.midi + 12 + currentDegree.semitones;
+
+      revealAnswer(false);
+      quizInstruction.style.display = 'none';
+      gridQuizAnswers.innerHTML = '';
+      buildQuizButtons();
+
+      sequenceAudio('direct');
+    }
+
+    btnPlayQuiz.addEventListener('click', () => {
+      const checkedIds = Array.from(document.querySelectorAll('#checkbox-grid input:checked')).map(el => el.dataset.id);
+      if (checkedIds.length === 0) {
+        alert("Coche au moins un degré dans les filtres !");
+        return;
+      }
+      buildQuizButtons();
+
+      const pool = DEGREES.filter(d => checkedIds.includes(d.id));
+      currentTonic = TONICS[Math.floor(Math.random() * TONICS.length)];
+      currentDegree = pool[Math.floor(Math.random() * pool.length)];
+      currentTargetMidi = currentTonic.midi + 12 + currentDegree.semitones;
+
+      sequenceAudio('quiz');
+    });
+
+    btnReplayAll.addEventListener('click', () => {
+      if (!currentTonic) return;
+      sequenceAudio('replay');
+    });
+
+    btnReplayNote.addEventListener('click', () => {
+      if (!currentTargetMidi) return;
+      initAudio();
+      statusEl.textContent = "Note seule...";
+      playTone(currentTargetMidi, actx.currentTime + 0.05, 2.5, 0.26);
+    });
+
+    btnReveal.addEventListener('click', () => {
+      if (!currentDegree) return;
+      revealAnswer(true);
+      // Met en surbrillance le bon bouton
+      const correctBtn = document.querySelector(`.btn-quiz-choice[data-id="${currentDegree.id}"]`);
+      if (correctBtn) correctBtn.classList.add('correct');
+      document.querySelectorAll('.btn-quiz-choice').forEach(b => b.disabled = true);
+    });
+  </script>
+</body>
+</html>
